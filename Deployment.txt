@@ -1,0 +1,40 @@
+
+# ============================================================
+# Deployment Guide — FP&A Variance Analysis Agent using BigQuery and ADK
+# ============================================================
+# NOTE: All values below are examples. Replace them with your
+#       own before running any command.
+#
+# Example values used in this file:
+#   PROJECT_ID    : my-gcp-project-****
+#   BUCKET_NAME   : my-agent-staging-****
+#   REGION        : us-west1
+#   DISPLAY_NAME  : "My Agent Display Name"
+#   PROJECT_NUMBER: 12345678****
+#   AGENT_ENGINE_ID: 503236466477262****
+
+# --- Step 1: Authenticate and set up gcloud CLI ---
+gcloud auth login
+gcloud components update
+
+# Set the target GCP project and configure application default credentials
+gcloud config set project my-gcp-project-****
+gcloud auth application-default login
+gcloud config set project my-gcp-project-****
+
+# --- Step 2: Enable required GCP services ---
+# Enables: Kubernetes, Artifact Registry, Cloud Build, Vertex AI, and Cloud Storage
+gcloud services enable container.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com aiplatform.googleapis.com storage.googleapis.com storage-component.googleapis.com storage-api.googleapis.com
+
+# --- Step 3: Create the staging Cloud Storage bucket ---
+# The bucket is used by ADK as a staging area during agent deployment
+# Adjust --location to match the region where you will deploy the agent
+gcloud storage buckets create gs://my-agent-staging-**** --project=my-gcp-project-**** --location=us-west1 --uniform-bucket-level-access
+
+# --- Step 4: Agent Engine Deployment ---
+
+# Option A — Create a new agent
+adk deploy agent_engine --project=my-gcp-project-**** --region=us-west1 --staging_bucket=gs://my-agent-staging-**** --display_name="My Agent Display Name" agentyx
+
+# Option B — Update an existing agent (provide the existing agent engine ID)
+adk deploy agent_engine --agent_engine_id projects/12345678****/locations/us-west1/reasoningEngines/503236466477262**** --project=my-gcp-project-**** --region=us-west1 --staging_bucket=gs://my-agent-staging-**** --display_name="My Agent Display Name" agentyx
